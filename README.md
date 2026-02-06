@@ -1,8 +1,8 @@
-# Getting Started with Create React App
+# Automatic Calendar
 
 This project is a **logic-based calendar simulator**.
 
-It intentionally avoids mathematical operations such as addition, subtraction, multiplication, or division.  
+It intentionally avoids mathematical operatgions such as addition, subtraction, multiplication, or division.  
 Yes, this is on purpose. No, it’s not sane.
 
 ## Available Scripts
