@@ -1,6 +1,9 @@
 # Getting Started with Create React App
 
-This is a sort-of automatic calendar with no usage of mathematical operations (addition, subtraction, division, multiplication)
+This project is a **logic-based calendar simulator**.
+
+It intentionally avoids mathematical operations such as addition, subtraction, multiplication, or division.  
+Yes, this is on purpose. No, it’s not sane.
 
 ## Available Scripts
 
@@ -8,18 +11,24 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the app in development mode.  
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The page reloads automatically when you make changes.  
+Any lint errors will be displayed in the console.
 
+## About the App
 
-### Info about the app
+- You can manually set the displayed date using a date input.
+- You can define the delay (in milliseconds) between each simulated day.
+- The internal logic detects:
+  - Months with 30 or 31 days
+  - February with 28 or 29 days
+  - Leap years, detected automatically by the system
 
-You can set the date shown by selecting in the date input
-You can set the milliseconds delay of each day
+## Important Disclaimer
 
-#### THIS PROJECT DOESN'T SHOW THE CORRECT DATE OF THE REAL CALENDAR
+⚠ **THIS PROJECT DOES NOT SHOW THE REAL CURRENT DATE**
 
-It's just a logic toy-project, which detects months with 30, 31 days and February with 28/29 when it's a leap year, which also is detected by the system
+This application is **not** a real-world calendar.  
+It is a **logic experiment / toy project** designed to simulate date progression based on internal rules, not actual time.
