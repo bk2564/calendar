@@ -1,5 +1,5 @@
 import './index.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function App() {
   const [leapYear, setLeapYear] = useState(false);
@@ -26,12 +26,12 @@ export default function App() {
         <label className="block mt-4">Change date:</label>
         <input type="date" className="mt-1 p-2 border border-gray-300 rounded" onChange={(e) => { 
            const date = e.target.value
-           changeDate({date, setDay, setMonth, setYear})
+           changeDate({date, setDay, setMonth, setYear, setLeapYear})
            } } />
         <h1 className="mt-6 text-2xl font-bold text-center"><CalendarDate date={new Date()} /></h1>
         <button onClick={() => updateDate({setDays})} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Check Month Days</button>
         <p className="mt-4 text-center text-gray-700">{days.length > 0 ? days[0].toString().padStart(2, '0') 
-        : updateMonth({setDays, months, setMonths, setMonth, leapYear, setYear})} 
+        : updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year})} 
         {months.length > 0 ? `/${months[0]}/` : ''}{year}
         </p>
       </div>
@@ -39,18 +39,22 @@ export default function App() {
   );
 }
 
-function changeDate({date, setDay, setMonth, setYear}){
+function changeDate({date, setDay, setMonth, setYear, setLeapYear}){
   const [year, month, day] = date.toString().split('-');
 
   setDay(day)
   setMonth(month)
   setYear(year)
+  
+  const leapYear = isLeapYear(year)
+  setLeapYear(leapYear)
+
 }
 
-function updateMonth({setDays, months, setMonths, setMonth, leapYear, setYear}) {
+function updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year}) {
   const newMonths = months.slice(1)
   if(newMonths.length === 0) {
-    updateYear({setYear, setMonths})
+    updateYear({setYear, setMonths, setLeapYear, year})
     return
   }
   setMonths(newMonths);
@@ -58,15 +62,20 @@ function updateMonth({setDays, months, setMonths, setMonth, leapYear, setYear}) 
   setDays(monthDays(newMonths[0], leapYear));
 }
 
-function updateYear({ setYear, setMonths}) {
-  setYear(prev => prev + 1)
+function updateYear({ setYear, setMonths, setLeapYear, year}) {
+  const newYear = year + 1
+  setYear(newYear)
   const months = yearMonths()
   setMonths(['00', ...months])
+  const leapYear = isLeapYear({year})
+  setLeapYear(leapYear)
 }
 
 
 function updateDate({setDays}) {
-  setDays(prev => prev.slice(1));
+  useEffect(() => {})
+    setInterval(setDays(prev => prev.slice(1)), 1000)
+  }
 }
 
 function yearMonths(){
@@ -84,7 +93,6 @@ function yearMonths(){
 
 // Set the month days based on the month and leap year status
 function monthDays(month, leapYear) {
-  console.log('Calculating month days for month:', month, 'leap year:', leapYear);
   let normalUnits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
   let dayTens = ['0', '1', '2', '3'];
   const thirtyDaysMonths = ['04', '06', '09', '11'];
@@ -116,22 +124,7 @@ function monthDays(month, leapYear) {
 
 
 // Checks if the year is a leap year and updates the leap year state accordingly
-function isLeapYear({ date, setLeapYear }) {
-  // const [dayCount, setDayCount] = useState(Array(9).fill(0));
-  const [day, month, year] = dateStr.split('/').map(Number);
-  const dateStr = '04/01/2026'; // DD/MM/YYYY
-  const monthTenUnits = ['0', '1', '2'];
-  const monthTens = ['0', '1'];
-
-  const normalDayTens = ['0', '1', '2'];
-  const febDayTens = ['0', '1', '2'];
-
-  if(day.split('')[0] in normalDayTens) {
-    // setDayCount(normalUnits);
-  }
-
-
-  console.log(day, month, year);
+function isLeapYear({ year }) {
   const [yearHundreds, yearUnits] = [Number(year.toString().slice(0, 2)), Number(year.toString().slice(2))];
   const yearUnit = Number(yearUnits.toString().slice(1));
   const yearTen = Number(yearUnits.toString().slice(0, 1));
@@ -144,52 +137,34 @@ function isLeapYear({ date, setLeapYear }) {
   const yearUnitOrHundredOddTensLeap = [2, 6]
   
   // Not a leap year if the unit is odd
-  if (yearUnit in yearUnitOdds) {
-    setLeapYear(false);
-    return
-  }
+  if (yearUnit in yearUnitOdds) return false
 
   if(yearUnits.toString() in ['00']) {
-    if(yearHundred in yearUnitOrHundredEvenTensLeap) {
-      if(yearThousand in yearEvenTenOrThousandLeap) {
-        setLeapYear(true);
-        return
-      }
-    }
-      if(yearHundred in yearUnitOrHundredOddTensLeap) {
-        if(yearThousand in yearOddTenOrThousandLeap) {
-          setLeapYear(true);
-          return
-        }
-    }
-    setLeapYear(false);
-    return
+    if(yearHundred in yearUnitOrHundredEvenTensLeap &&
+      yearThousand in yearEvenTenOrThousandLeap) return true
+     
+    if(yearHundred in yearUnitOrHundredOddTensLeap &&
+      yearThousand in yearOddTenOrThousandLeap) return true
+    
+    return false
   }
 
-
-  
   // Leap year calculation when the tens are even
   if (yearUnit in yearUnitOrHundredEvenTensLeap) {
-    if(yearTen in yearEvenTenOrThousandLeap) {
-    setLeapYear(true);
-    return
+    
+    if(yearTen in yearEvenTenOrThousandLeap) return true
+
+    return false
   }
-  setLeapYear(false);
-  return
-}
 
 // Leap year calculation when the tens are odd
   if (yearUnit in yearUnitOrHundredOddTensLeap) {
-    if(yearTen in yearOddTenOrThousandLeap) {
-    setLeapYear(true);
-    return
-  } 
-  setLeapYear(false);
-  return
+    
+    if(yearTen in yearOddTenOrThousandLeap) return true
+    
+    return false
 }
 
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return date.toLocaleDateString(undefined, options);
 }
 
 function CalendarDate({ date, setLeapYear }) {
