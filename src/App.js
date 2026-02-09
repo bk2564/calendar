@@ -39,7 +39,7 @@ export default function App() {
     <div className="app bg-gray-100 min-h-screen">
       <div className="content p-4">
         <h2 className="text-lg font-semibold mb-4">Welcome to the Calendar App!</h2>
-        <p className="text-gray-700">This is a simple calendar application built with React and Tailwind CSS, with no mathematical operations (besides a + 1 in updateYear()).</p>
+        <p className="text-gray-700">This is a simple calendar application built with React and Tailwind CSS, with no mathematical operations.</p>
         <label className="block mt-4">Change date:</label>
         <input type="date" className="mt-1 p-2 border border-gray-300 rounded" onChange={(e) => { 
           const date = e.target.value
@@ -92,7 +92,13 @@ function updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYea
 }
 
 function updateYear({ setYear, setMonths, setDays, setLeapYear, year}) {
-  const newYear = year + 1
+  let y = 1
+  let newYear = year;
+  while (y !== 0 ){
+    const carry = newYear & y
+    newYear ^= y
+    y = carry << 1
+  }
   setYear(newYear)
   const months = yearMonths()
   setMonths(['01', ...months])

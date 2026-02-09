@@ -2,7 +2,7 @@
 
 This project is a **logic-based calendar simulator**.
 
-It intentionally avoids mathematical operatgions such as addition, subtraction, multiplication, or division. (there is one '+1' at updateYear())  
+It intentionally avoids mathematical operatgions such as addition, subtraction, multiplication, or division. (yes, even updateYear(), which sets the next year)  
 Yes, this is on purpose. No, it’s not sane.
 
 ## Available Scripts
