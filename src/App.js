@@ -2,22 +2,39 @@ import './index.css';
 import React, { useState, useEffect } from 'react';
 
 export default function App() {
+  const [day, setDay] = useState('24');
   const [leapYear, setLeapYear] = useState(false);
   const [month, setMonth] = useState('12');
-  const [day, setDay] = useState(new Date().getDate());
+  const [autoRun, setAutoRun] = useState(false)
   const [months, setMonths] = useState(
-      yearMonths().slice(yearMonths()
-      .findIndex((yearMonth) => yearMonth == month))
-    );
-    const [days, setDays] = useState(
-      monthDays(months[0], leapYear).slice(monthDays(months[0], leapYear)
-      .findIndex((monthDay) => monthDay == day))
-    );
+    yearMonths().slice(yearMonths()
+    .findIndex((yearMonth) => yearMonth == month))
+  );
+  const [days, setDays] = useState(
+    monthDays(months[0], leapYear).slice(monthDays(months[0], leapYear)
+    .findIndex((monthDay) => monthDay == day))
+  );
   const [year, setYear] = useState(new Date().getFullYear());
+  const [milliseconds, setMilliseconds] = useState(1000)
 
 
-  // const [monthDaysValue, setMonthDays] = useState(null);
-  // updateDateInMillisecondsInterval(new Date(), 1000);
+  useEffect(() => {
+    
+    const interval = setInterval(() => {
+      if(autoRun){
+
+        setDays(prevDays => {
+          if(prevDays.length <= 1){
+            updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year});
+            return prevDays;
+          }
+          return prevDays.slice(1)
+        })
+      }
+    }, milliseconds)
+    return () => clearInterval(interval)
+  }, [autoRun, months, leapYear, year])
+
   return (
     <div className="app bg-gray-100 min-h-screen">
       <div className="content p-4">
@@ -25,14 +42,27 @@ export default function App() {
         <p className="text-gray-700">This is a simple calendar application built with React and Tailwind CSS.</p>
         <label className="block mt-4">Change date:</label>
         <input type="date" className="mt-1 p-2 border border-gray-300 rounded" onChange={(e) => { 
-           const date = e.target.value
+          const date = e.target.value
            changeDate({date, setDay, setMonth, setYear, setLeapYear})
            } } />
         <h1 className="mt-6 text-2xl font-bold text-center"><CalendarDate date={new Date()} /></h1>
-        <button onClick={() => updateDate({setDays})} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Check Month Days</button>
-        <p className="mt-4 text-center text-gray-700">{days.length > 0 ? days[0].toString().padStart(2, '0') 
-        : updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year})} 
-        {months.length > 0 ? `/${months[0]}/` : ''}{year}
+        <p>The interval will be updated at the start of the next month. If you want it to be updated now, stop and start the autorun</p>
+        <input type="number" className="mt-1 p-2 border border-gray-300 rounded" id="millisInterval" 
+        placeholder='Set the update interval (in milliseconds)'></input>
+        <button onClick={() => {
+          if(autoRun){
+            setAutoRun(false);
+            setMilliseconds(
+              document.getElementById('millisInterval').value)
+              setAutoRun(true);
+            } else setMilliseconds(document.getElementById('millisInterval').value)
+            }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Set</button><br></br>
+        <p>Auto-run</p>
+        <button onClick={() => setAutoRun(true)} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Start</button><br></br>
+        <button onClick={() => setAutoRun(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">Stop</button>
+        <p className="mt-4 text-center text-gray-700">
+          {/* {days.length > 0 ? days[0].padStart(2, '0') : '00'} */}
+          {days[0]}/{months[0]}/{year}
         </p>
       </div>
     </div>
@@ -54,29 +84,25 @@ function changeDate({date, setDay, setMonth, setYear, setLeapYear}){
 function updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year}) {
   const newMonths = months.slice(1)
   if(newMonths.length === 0) {
-    updateYear({setYear, setMonths, setLeapYear, year})
+    updateYear({setYear, setMonths, setDays, setLeapYear, year})
     return
   }
+  setDays(monthDays(newMonths[0], leapYear));
   setMonths(newMonths);
   setMonth(newMonths[0]);
-  setDays(monthDays(newMonths[0], leapYear));
 }
 
-function updateYear({ setYear, setMonths, setLeapYear, year}) {
+function updateYear({ setYear, setMonths, setDays, setLeapYear, year}) {
   const newYear = year + 1
   setYear(newYear)
   const months = yearMonths()
-  setMonths(['00', ...months])
+  setMonths(['01', ...months])
   const leapYear = isLeapYear({year})
+  setDays(monthDays(months[0], leapYear));
   setLeapYear(leapYear)
 }
 
 
-function updateDate({setDays}) {
-  useEffect(() => {})
-    setInterval(setDays(prev => prev.slice(1)), 1000)
-  }
-}
 
 function yearMonths(){
   const normalUnits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
