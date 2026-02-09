@@ -43,11 +43,11 @@ export default function App() {
         <label className="block mt-4">Change date:</label>
         <input type="date" className="mt-1 p-2 border border-gray-300 rounded" onChange={(e) => { 
           const date = e.target.value
-           changeDate({date, setDay, setMonth, setYear, setLeapYear})
+           changeDate({date, setDays, setMonths, setYear, setLeapYear})
            } } />
         <h1 className="mt-6 text-2xl font-bold text-center"><CalendarDate date={new Date()} /></h1>
-        <p>The interval will be updated at the start of the next month. If you want it to be updated now, stop and start the autorun</p>
-        <input type="number" className="mt-1 p-2 border border-gray-300 rounded" id="millisInterval" 
+        <p className='mt-4 text-gray-700' >The interval will be updated at the start of the next month. If you want it to be updated now, stop and start the autorun</p>
+        <input type="number" className="mt-1 mr-4 p-2 border border-gray-300 rounded" id="millisInterval" 
         placeholder='Set the update interval (in milliseconds)'></input>
         <button onClick={() => {
           if(autoRun){
@@ -57,7 +57,7 @@ export default function App() {
               setAutoRun(true);
             } else setMilliseconds(document.getElementById('millisInterval').value)
             }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Set</button><br></br>
-        <p>Auto-run</p>
+        <br></br><p className='mt-4 text-gray-700 font-bold'>Auto-run</p>
         <button onClick={() => setAutoRun(true)} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Start</button><br></br>
         <button onClick={() => setAutoRun(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">Stop</button>
         <p className="mt-4 text-center text-gray-700">
@@ -69,16 +69,15 @@ export default function App() {
   );
 }
 
-function changeDate({date, setDay, setMonth, setYear, setLeapYear}){
+function changeDate({date, setDays, setMonths, setYear, setLeapYear}){
   const [year, month, day] = date.toString().split('-');
-
-  setDay(day)
-  setMonth(month)
   setYear(year)
-  
-  const leapYear = isLeapYear(year)
+  const leapYear = isLeapYear({year})
   setLeapYear(leapYear)
-
+  const months = yearMonths().slice(yearMonths().findIndex(x => x == month))
+  const days = monthDays(months[0], leapYear).slice(monthDays(months[0], leapYear).findIndex(x => x == day));
+  setDays(days)
+  setMonths(months)
 }
 
 function updateMonth({setDays, months, setMonths, setMonth, leapYear, setLeapYear, setYear, year}) {
